@@ -104,17 +104,7 @@ func createPool(pathfinder func(string) (string, error), runCmd runFunc, chownFu
 	if err = definePool(poolDir, runCmd, chownFunc); err != nil {
 		return errors.Trace(err)
 	}
-	if err = buildPool(runCmd); err != nil {
-		return errors.Trace(err)
-	}
-
-	if err = startPool(runCmd); err != nil {
-		return errors.Trace(err)
-	}
-	if err = autostartPool(runCmd); err != nil {
-		return errors.Trace(err)
-	}
-
+	
 	// We have to set ownership of the guest pool directory after running virsh
 	// commands above, because it appears that the libvirt-bin version that
 	// ships with trusty sets the ownership of the pool directory to the user
@@ -123,6 +113,17 @@ func createPool(pathfinder func(string) (string, error), runCmd runFunc, chownFu
 	// write them as libvirt-qemu:kvm so that libvirt -- which runs as that
 	// user -- can read them to boot the domains.
 	if err = chownFunc(poolDir); err != nil {
+		return errors.Trace(err)
+	}
+	
+	if err = buildPool(runCmd); err != nil {
+		return errors.Trace(err)
+	}
+
+	if err = startPool(runCmd); err != nil {
+		return errors.Trace(err)
+	}
+	if err = autostartPool(runCmd); err != nil {
 		return errors.Trace(err)
 	}
 
